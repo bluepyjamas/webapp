@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>For Hannah 🤍</title>
     
-    <!-- Clean, Elegant Fonts -->
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;1,400&family=Great+Vibes&family=Montserrat:wght@300;400;500&display=swap');
 
@@ -400,7 +399,7 @@
             justify-content: center;
         }
 
-        .next-btn {
+        .nav-btn {
             background: transparent;
             border: 1px solid var(--border-light);
             color: var(--accent);
@@ -415,7 +414,7 @@
             transition: all 0.3s ease;
         }
 
-        .next-btn:hover {
+        .nav-btn:hover {
             background-color: var(--accent);
             border-color: var(--accent);
             color: var(--bg-color);
@@ -471,20 +470,16 @@
 </head>
 <body>
 
-    <!-- Ambient Subtle Background Elements -->
     <div class="ambient-background" id="ambient-layer"></div>
 
-    <!-- Minimalist Visualizer / Toggle -->
     <div class="audio-indicator" id="audio-toggle" title="Mute/Unmute">
         <div class="audio-bar"></div>
         <div class="audio-bar"></div>
         <div class="audio-bar"></div>
     </div>
 
-    <!-- Local Audio Setup -->
     <audio id="bg-music" src="Vivid.mp3" loop preload="auto"></audio>
 
-    <!-- Entrance Screen -->
     <div id="entrance-screen">
         <div class="envelope-text">
             <p class="recipient-sub">A letter and a melody for</p>
@@ -493,7 +488,6 @@
         <button class="enter-btn" id="start-btn">Open & Turn Sound On 🔊</button>
     </div>
 
-    <!-- The Story Container -->
     <div id="main-content">
         <h1>For You</h1>
         
@@ -501,7 +495,6 @@
         
         <div id="book-container">
             
-            <!-- CHAPTER 1 -->
             <div class="chapter active">
                 <div class="chapter-title">Chapter I: The Little Things</div>
                 
@@ -518,7 +511,6 @@
                 </p>
             </div>
 
-            <!-- CHAPTER 2 -->
             <div class="chapter">
                 <div class="chapter-title">Chapter II: The Realization</div>
                 
@@ -535,7 +527,6 @@
                 </p>
             </div>
 
-            <!-- CHAPTER 3 -->
             <div class="chapter">
                 <div class="chapter-title">Chapter III: My Hope</div>
                 
@@ -552,7 +543,6 @@
                 </p>
             </div>
 
-            <!-- CHAPTER 4 -->
             <div class="chapter">
                 <div class="chapter-title">Chapter IV: The Future</div>
                 
@@ -567,7 +557,6 @@
                 </p>
             </div>
 
-            <!-- CHAPTER 5 (EPILOGUE / LYRICS) -->
             <div class="chapter">
                 <div class="chapter-title">Epilogue: Nais Ko</div>
                 
@@ -597,25 +586,29 @@
 
         </div>
 
-        <!-- Navigation Controls -->
         <div class="controls">
             <div class="btn-row">
-                <button class="next-btn" id="prev-btn" style="display: none;">Previous</button>
-                <button class="next-btn" id="next-btn">Next</button>
+                <button class="nav-btn" id="prev-btn" style="display: none;">Previous</button>
+                <button class="nav-btn" id="next-btn">Next</button>
             </div>
             <button class="replay-btn" id="replay-btn">Start Over</button>
             
-            <!-- Dots container -->
             <div class="progress-dots" id="dots-container"></div>
         </div>
 
     </div>
 
-    <!-- Script Logic -->
     <script>
         const audio = document.getElementById('bg-music');
         const audioToggle = document.getElementById('audio-toggle');
-        audio.volume = 1.0; 
+        const chapters = document.querySelectorAll('.chapter');
+        const dotsContainer = document.getElementById('dots-container');
+        const nextBtn = document.getElementById('next-btn');
+        const prevBtn = document.getElementById('prev-btn');
+        const replayBtn = document.getElementById('replay-btn');
+
+        let currentChapter = 0;
+        let fadeInterval = null; // Used to prevent overlapping audio fades
 
         // 1. Updated Playlist Mapping
         const chapterSongs = [
@@ -626,22 +619,14 @@
             "nais ko.mp3"       // Chapter V (Epilogue with Lyrics)
         ];
 
-        // 2. Setup Chapters and Dynamic Dots
-        const chapters = document.querySelectorAll('.chapter');
-        const dotsContainer = document.getElementById('dots-container');
-        
+        // 2. Setup Dynamic Dots
         chapters.forEach((_, index) => {
             const dot = document.createElement('span');
             dot.classList.add('dot');
             if (index === 0) dot.classList.add('active');
             dotsContainer.appendChild(dot);
         });
-        
         const dots = document.querySelectorAll('.dot');
-        let currentChapter = 0;
-        const nextBtn = document.getElementById('next-btn');
-        const prevBtn = document.getElementById('prev-btn');
-        const replayBtn = document.getElementById('replay-btn');
 
         // Dynamic Background Particle Generator
         function createAmbientMotes() {
@@ -659,39 +644,78 @@
         }
         createAmbientMotes();
 
-        // Smooth Audio Fade Transition Engine
+        // 3. Smooth Audio Fade Engine
         function playSongForChapter(index) {
             const targetSong = chapterSongs[index] || chapterSongs[chapterSongs.length - 1];
-            if (!audio.src.endsWith(targetSong)) {
-                let fadeOutInterval = setInterval(() => {
-                    if (audio.volume > 0.1) {
-                        audio.volume -= 0.1;
+            
+            if (audio.src.endsWith(targetSong)) return; // Don't restart if already playing
+
+            // Clear any ongoing fade to prevent overlapping glitches
+            if (fadeInterval) clearInterval(fadeInterval);
+
+            // Fade Out
+            fadeInterval = setInterval(() => {
+                if (audio.volume > 0.1) {
+                    audio.volume = Math.max(0, audio.volume - 0.1); 
+                } else {
+                    clearInterval(fadeInterval);
+                    
+                    audio.src = targetSong;
+                    audio.load();
+                    
+                    if (audioToggle.classList.contains('playing')) {
+                        audio.play().then(() => {
+                            // Fade In
+                            fadeInterval = setInterval(() => {
+                                if (audio.volume < 0.9) {
+                                    audio.volume = Math.min(1.0, audio.volume + 0.1);
+                                } else {
+                                    audio.volume = 1.0;
+                                    clearInterval(fadeInterval);
+                                }
+                            }, 40);
+                        }).catch(err => console.log("Playback blocked:", err));
                     } else {
-                        clearInterval(fadeOutInterval);
-                        audio.src = targetSong;
-                        audio.load();
-                        
-                        // Only play if not muted via visualizer toggle
-                        if (audioToggle.classList.contains('playing')) {
-                            audio.play().then(() => {
-                                let fadeInInterval = setInterval(() => {
-                                    if (audio.volume < 0.9) {
-                                        audio.volume += 0.1;
-                                    } else {
-                                        audio.volume = 1.0;
-                                        clearInterval(fadeInInterval);
-                                    }
-                                }, 40);
-                            }).catch(err => console.log("Playback blocked:", err));
-                        } else {
-                            audio.volume = 1.0;
-                        }
+                        audio.volume = 1.0;
                     }
-                }, 40);
-            }
+                }
+            }, 40);
         }
 
-        // Mute/Unmute visualizer click action
+        // 4. Centralized Chapter Navigation Logic (DRY Principle)
+        function goToChapter(index) {
+            if (index < 0 || index >= chapters.length) return;
+
+            // Fade out current chapter
+            chapters[currentChapter].classList.remove('active');
+            dots[currentChapter].classList.remove('active');
+            
+            setTimeout(() => {
+                currentChapter = index;
+                
+                // Fade in new chapter
+                chapters[currentChapter].classList.add('active');
+                dots[currentChapter].classList.add('active');
+                playSongForChapter(currentChapter);
+                
+                // Update button visibility
+                prevBtn.style.display = currentChapter > 0 ? 'block' : 'none';
+                
+                if (currentChapter === chapters.length - 1) {
+                    nextBtn.style.display = 'none';
+                    replayBtn.style.display = 'block';
+                } else {
+                    nextBtn.style.display = 'block';
+                    replayBtn.style.display = 'none';
+                }
+            }, 800); // Wait for CSS transition
+        }
+
+        // 5. Event Listeners
+        nextBtn.addEventListener('click', () => goToChapter(currentChapter + 1));
+        prevBtn.addEventListener('click', () => goToChapter(currentChapter - 1));
+        replayBtn.addEventListener('click', () => goToChapter(0));
+
         audioToggle.addEventListener('click', function() {
             if (audio.paused) {
                 audio.play();
@@ -702,8 +726,8 @@
             }
         });
 
-        // 3. Entrance Button Logic
         document.getElementById('start-btn').addEventListener('click', function() {
+            audio.volume = 1.0;
             audio.src = chapterSongs[0];
             audio.play().then(() => {
                 audioToggle.classList.add('playing');
@@ -712,78 +736,13 @@
             audioToggle.classList.add('visible');
             const entranceScreen = document.getElementById('entrance-screen');
             entranceScreen.style.opacity = '0';
-            setTimeout(() => { entranceScreen.style.display = 'none'; }, 1500);
-
-            document.getElementById('main-content').classList.add('visible');
-        });
-
-        // 4. Next Chapter Navigation Logic
-        nextBtn.addEventListener('click', function() {
-            chapters[currentChapter].classList.remove('active');
-            dots[currentChapter].classList.remove('active');
             
-            setTimeout(() => {
-                currentChapter++;
-                
-                if (currentChapter < chapters.length) {
-                    chapters[currentChapter].classList.add('active');
-                    dots[currentChapter].classList.add('active');
-                    playSongForChapter(currentChapter);
-                }
-                
-                // Toggle display rules for buttons
-                if (currentChapter > 0) {
-                    prevBtn.style.display = 'block';
-                }
-                if (currentChapter === chapters.length - 1) {
-                    nextBtn.style.display = 'none';
-                    replayBtn.style.display = 'block';
-                }
-            }, 800);
+            setTimeout(() => { 
+                entranceScreen.style.display = 'none'; 
+                document.getElementById('main-content').classList.add('visible');
+            }, 1500);
         });
 
-        // 5. Previous Chapter Navigation Logic
-        prevBtn.addEventListener('click', function() {
-            chapters[currentChapter].classList.remove('active');
-            dots[currentChapter].classList.remove('active');
-            
-            setTimeout(() => {
-                currentChapter--;
-                
-                if (currentChapter >= 0) {
-                    chapters[currentChapter].classList.add('active');
-                    dots[currentChapter].classList.add('active');
-                    playSongForChapter(currentChapter);
-                }
-                
-                // Toggle display rules for buttons back down
-                if (currentChapter === 0) {
-                    prevBtn.style.display = 'none';
-                }
-                nextBtn.style.display = 'block';
-                replayBtn.style.display = 'none';
-            }, 800);
-        });
-
-        // 6. Replay Button Logic
-        replayBtn.addEventListener('click', function() {
-            chapters[currentChapter].classList.remove('active');
-            dots[currentChapter].classList.remove('active');
-            
-            setTimeout(() => {
-                currentChapter = 0;
-                
-                chapters[currentChapter].classList.add('active');
-                dots[currentChapter].classList.add('active');
-                
-                replayBtn.style.display = 'none';
-                prevBtn.style.display = 'none';
-                nextBtn.style.display = 'block';
-                
-                playSongForChapter(currentChapter);
-            }, 800);
-        });
     </script>
-
 </body>
 </html>

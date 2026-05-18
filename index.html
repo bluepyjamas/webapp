@@ -37,6 +37,70 @@
             padding: 20px;
             overflow-x: hidden;
             -webkit-font-smoothing: antialiased;
+            position: relative;
+        }
+
+        /* --- AMBIENT BACKGROUND PARTICLES --- */
+        .ambient-background {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1;
+            overflow: hidden;
+        }
+
+        .mote {
+            position: absolute;
+            background: rgba(90, 80, 82, 0.04);
+            border-radius: 50%;
+            animation: floatUp 12s linear infinite;
+            bottom: -20px;
+        }
+
+        @keyframes floatUp {
+            0% { transform: translateY(0) translateX(0) scale(1); opacity: 0; }
+            10% { opacity: 1; }
+            90% { opacity: 0.8; }
+            100% { transform: translateY(-105vh) translateX(50px) scale(0.5); opacity: 0; }
+        }
+
+        /* --- MINIMAL AUDIO VISUALIZER --- */
+        .audio-indicator {
+            position: fixed;
+            top: 30px;
+            right: 30px;
+            display: flex;
+            align-items: flex-end;
+            gap: 3px;
+            width: 30px;
+            height: 20px;
+            cursor: pointer;
+            z-index: 110;
+            opacity: 0;
+            transition: opacity 1s ease;
+        }
+        
+        .audio-indicator.visible { opacity: 0.7; }
+        .audio-indicator.visible:hover { opacity: 1; }
+
+        .audio-bar {
+            width: 3px;
+            background-color: var(--accent);
+            height: 5px;
+            border-radius: 1px;
+            transition: height 0.2s ease;
+        }
+
+        .audio-indicator.playing .audio-bar:nth-child(1) { animation: pulseBar 0.6s ease infinite alternate; }
+        .audio-indicator.playing .audio-bar:nth-child(2) { animation: pulseBar 0.9s ease infinite alternate 0.15s; }
+        .audio-indicator.playing .audio-bar:nth-child(3) { animation: pulseBar 0.7s ease infinite alternate 0.3s; }
+
+        @keyframes pulseBar {
+            0% { height: 4px; }
+            100% { height: 20px; }
         }
 
         /* --- ENTRANCE SCREEN --- */
@@ -327,6 +391,7 @@
             flex-direction: column;
             align-items: center;
             gap: 20px;
+            z-index: 10;
         }
 
         .btn-row {
@@ -400,10 +465,21 @@
             .letter-body, .lyrics-body { font-size: 1.15rem; padding: 0 10px; }
             .collage-wrapper { max-width: 320px; margin-bottom: 30px; }
             .collage-img { border-width: 5px; border-bottom-width: 20px; }
+            .audio-indicator { top: 20px; right: 20px; }
         }
     </style>
 </head>
 <body>
+
+    <!-- Ambient Subtle Background Elements -->
+    <div class="ambient-background" id="ambient-layer"></div>
+
+    <!-- Minimalist Visualizer / Toggle -->
+    <div class="audio-indicator" id="audio-toggle" title="Mute/Unmute">
+        <div class="audio-bar"></div>
+        <div class="audio-bar"></div>
+        <div class="audio-bar"></div>
+    </div>
 
     <!-- Local Audio Setup -->
     <audio id="bg-music" src="Vivid.mp3" loop preload="auto"></audio>
@@ -538,6 +614,7 @@
     <!-- Script Logic -->
     <script>
         const audio = document.getElementById('bg-music');
+        const audioToggle = document.getElementById('audio-toggle');
         audio.volume = 1.0; 
 
         // 1. Updated Playlist Mapping
@@ -566,20 +643,73 @@
         const prevBtn = document.getElementById('prev-btn');
         const replayBtn = document.getElementById('replay-btn');
 
-        // Helper function to manage song transitions smoothly
+        // Dynamic Background Particle Generator
+        function createAmbientMotes() {
+            const layer = document.getElementById('ambient-layer');
+            const moteCount = 15;
+            for (let i = 0; i < moteCount; i++) {
+                let mote = document.createElement('div');
+                mote.classList.add('mote');
+                mote.style.width = mote.style.height = Math.random() * 6 + 4 + 'px';
+                mote.style.left = Math.random() * 100 + 'vw';
+                mote.style.animationDelay = Math.random() * 12 + 's';
+                mote.style.animationDuration = Math.random() * 8 + 10 + 's';
+                layer.appendChild(mote);
+            }
+        }
+        createAmbientMotes();
+
+        // Smooth Audio Fade Transition Engine
         function playSongForChapter(index) {
             const targetSong = chapterSongs[index] || chapterSongs[chapterSongs.length - 1];
             if (!audio.src.endsWith(targetSong)) {
-                audio.src = targetSong;
-                audio.play().catch(error => console.log("Audio playback failed:", error));
+                let fadeOutInterval = setInterval(() => {
+                    if (audio.volume > 0.1) {
+                        audio.volume -= 0.1;
+                    } else {
+                        clearInterval(fadeOutInterval);
+                        audio.src = targetSong;
+                        audio.load();
+                        
+                        // Only play if not muted via visualizer toggle
+                        if (audioToggle.classList.contains('playing')) {
+                            audio.play().then(() => {
+                                let fadeInInterval = setInterval(() => {
+                                    if (audio.volume < 0.9) {
+                                        audio.volume += 0.1;
+                                    } else {
+                                        audio.volume = 1.0;
+                                        clearInterval(fadeInInterval);
+                                    }
+                                }, 40);
+                            }).catch(err => console.log("Playback blocked:", err));
+                        } else {
+                            audio.volume = 1.0;
+                        }
+                    }
+                }, 40);
             }
         }
+
+        // Mute/Unmute visualizer click action
+        audioToggle.addEventListener('click', function() {
+            if (audio.paused) {
+                audio.play();
+                audioToggle.classList.add('playing');
+            } else {
+                audio.pause();
+                audioToggle.classList.remove('playing');
+            }
+        });
 
         // 3. Entrance Button Logic
         document.getElementById('start-btn').addEventListener('click', function() {
             audio.src = chapterSongs[0];
-            audio.play().catch(error => console.log("Audio playback failed:", error));
+            audio.play().then(() => {
+                audioToggle.classList.add('playing');
+            }).catch(error => console.log("Audio playback failed:", error));
 
+            audioToggle.classList.add('visible');
             const entranceScreen = document.getElementById('entrance-screen');
             entranceScreen.style.opacity = '0';
             setTimeout(() => { entranceScreen.style.display = 'none'; }, 1500);
@@ -650,9 +780,7 @@
                 prevBtn.style.display = 'none';
                 nextBtn.style.display = 'block';
                 
-                audio.src = chapterSongs[0];
-                audio.play().catch(error => console.log("Audio playback failed:", error));
-                
+                playSongForChapter(currentChapter);
             }, 800);
         });
     </script>

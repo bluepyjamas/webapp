@@ -1,0 +1,661 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>For Hannah 🤍</title>
+    
+    <!-- Clean, Elegant Fonts -->
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;1,400&family=Great+Vibes&family=Montserrat:wght@300;400;500&display=swap');
+
+        /* Centralized Color Palette */
+        :root {
+            --bg-color: #faf9f6;
+            --text-dark: #2c2c2c;
+            --text-medium: #3d3d3d;
+            --text-light: #7a6e70;
+            --accent: #5a5052;
+            --border-light: #d1c8c9;
+            --border-dark: #c2b8ba;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Cormorant Garamond', serif;
+            background-color: var(--bg-color);
+            color: var(--text-dark);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+            overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* --- ENTRANCE SCREEN --- */
+        #entrance-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: var(--bg-color);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 100;
+            transition: opacity 1.5s ease, visibility 1.5s ease;
+        }
+
+        .envelope-text {
+            text-align: center;
+            margin-bottom: 40px;
+            animation: fadeIn 2s ease-in-out;
+        }
+
+        .recipient-sub {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 0.75rem;
+            letter-spacing: 4px;
+            text-transform: uppercase;
+            color: var(--text-light);
+            margin-bottom: 5px;
+        }
+
+        .recipient-name {
+            font-family: 'Great Vibes', cursive;
+            font-size: 3.5rem;
+            color: var(--text-dark);
+            letter-spacing: 2px;
+        }
+
+        .enter-btn {
+            background: transparent;
+            border: 1px solid var(--border-dark);
+            color: var(--accent);
+            padding: 15px 40px;
+            font-family: 'Montserrat', sans-serif;
+            font-size: 0.8rem;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            font-weight: 300;
+            cursor: pointer;
+            border-radius: 3px;
+            transition: all 0.4s ease;
+        }
+
+        .enter-btn:hover {
+            background-color: var(--accent);
+            color: var(--bg-color);
+            border-color: var(--accent);
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* --- MAIN CONTENT --- */
+        #main-content {
+            opacity: 0;
+            transform: translateY(15px);
+            transition: opacity 2s ease 0.5s, transform 2s ease 0.5s;
+            max-width: 700px;
+            width: 100%;
+            text-align: center;
+            z-index: 10;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 40px 20px;
+        }
+
+        #main-content.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        h1 {
+            font-size: 2.8rem;
+            font-weight: 400;
+            color: var(--text-dark);
+            margin-bottom: 5px;
+            letter-spacing: 2px;
+            font-style: italic;
+        }
+
+        .divider {
+            border: 0;
+            height: 1px;
+            width: 40px;
+            background-color: var(--border-light);
+            margin: 20px auto 40px auto;
+        }
+
+        /* --- CHAPTER LAYOUT --- */
+        #book-container {
+            position: relative;
+            width: 100%;
+            min-height: 65vh; 
+            display: flex;
+            justify-content: center;
+        }
+
+        .chapter {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 1s ease;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .chapter.active {
+            opacity: 1;
+            visibility: visible;
+            position: relative;
+        }
+
+        .chapter-title {
+            font-size: 0.75rem;
+            color: var(--text-light);
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 400;
+            letter-spacing: 4px;
+            text-transform: uppercase;
+            margin-bottom: 30px;
+        }
+
+        /* --- RESPONSIVE COLLAGE CSS --- */
+        .collage-wrapper {
+            position: relative;
+            width: 100%;
+            max-width: 380px;
+            aspect-ratio: 4 / 3; 
+            margin-bottom: 45px;
+            animation: float 6s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-8px); }
+            100% { transform: translateY(0px); }
+        }
+
+        .collage-img {
+            position: absolute;
+            border: 7px solid #fff;
+            border-bottom: 28px solid #fff; 
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.12);
+            object-fit: cover;
+            border-radius: 2px;
+            filter: sepia(15%) contrast(105%);
+            opacity: 0;
+            margin-top: 30px;
+            transition: transform 0.5s cubic-bezier(0.25, 1, 0.5, 1), z-index 0.4s, box-shadow 0.4s, filter 0.4s;
+        }
+
+        .chapter.active .img-1 { opacity: 1; margin-top: 0; transition: all 0.8s cubic-bezier(0.2, 0.8, 0.2, 1) 0.2s; }
+        .chapter.active .img-2 { opacity: 1; margin-top: 0; transition: all 0.8s cubic-bezier(0.2, 0.8, 0.2, 1) 0.4s; }
+        .chapter.active .img-3 { opacity: 1; margin-top: 0; transition: all 0.8s cubic-bezier(0.2, 0.8, 0.2, 1) 0.6s; }
+
+        .collage-img:hover {
+            transform: scale(1.1) rotate(0deg) !important;
+            z-index: 10 !important;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+            filter: sepia(0%) contrast(110%);
+            cursor: pointer;
+        }
+
+        .img-1 { width: 55%; height: 75%; top: 5%; left: 0%; transform: rotate(-8deg); z-index: 1; }
+        .img-2 { width: 50%; height: 70%; top: 12%; right: 0%; transform: rotate(10deg); z-index: 2; }
+        .img-3 { width: 60%; height: 65%; bottom: 0%; left: 20%; transform: rotate(-3deg); z-index: 3; }
+
+        /* --- TYPOGRAPHY & MESSAGE EFFECTS --- */
+        .letter-body {
+            font-size: 1.25rem;
+            line-height: 1.8;
+            color: var(--text-medium);
+            text-align: center;
+            white-space: pre-line;
+            font-weight: 400;
+            max-width: 550px;
+            opacity: 0;
+            transform: translateY(15px);
+            transition: opacity 1.2s ease, transform 1.2s ease;
+        }
+
+        .chapter.active .letter-body {
+            opacity: 1;
+            transform: translateY(0);
+            transition-delay: 1.2s; 
+        }
+
+        /* --- LYRICS BLOCK LAYOUT --- */
+        .lyrics-container {
+            margin-top: 10px;
+            padding: 30px 20px;
+            border-left: 1px solid var(--border-light);
+            border-right: 1px solid var(--border-light);
+            background-color: rgba(255, 255, 255, 0.3);
+            border-radius: 4px;
+            max-width: 480px;
+            width: 100%;
+            opacity: 0;
+            transform: translateY(15px);
+            transition: opacity 1.2s ease, transform 1.2s ease;
+        }
+
+        .chapter.active .lyrics-container {
+            opacity: 1;
+            transform: translateY(0);
+            transition-delay: 1.2s;
+        }
+
+        .lyrics-title {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 0.75rem;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            color: var(--text-light);
+            margin-bottom: 25px;
+            font-weight: 500;
+        }
+
+        .lyrics-body {
+            font-family: 'Cormorant Garamond', serif;
+            font-style: italic;
+            font-size: 1.25rem;
+            line-height: 2;
+            color: var(--text-medium);
+            white-space: pre-line;
+            text-align: center;
+        }
+
+        .highlight {
+            color: var(--text-dark);
+            font-weight: 500;
+            font-style: italic;
+            position: relative;
+            display: inline-block;
+        }
+        
+        .highlight::after {
+            content: '';
+            position: absolute;
+            bottom: 4px;
+            left: -2px;
+            width: calc(100% + 4px);
+            height: 6px;
+            background-color: rgba(90, 80, 82, 0.12);
+            z-index: -1;
+            border-radius: 2px;
+        }
+
+        .signature {
+            margin-top: 40px;
+            font-family: 'Great Vibes', cursive;
+            font-size: 2.8rem;
+            color: var(--accent);
+            opacity: 0;
+            transform: translateY(10px);
+            transition: opacity 1s ease, transform 1s ease;
+        }
+
+        .chapter.active .signature {
+            opacity: 1;
+            transform: translateY(0);
+            transition-delay: 2s; 
+        }
+
+        /* --- NAVIGATION CONTROLS --- */
+        .controls {
+            margin-top: 30px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .btn-row {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+        }
+
+        .next-btn {
+            background: transparent;
+            border: 1px solid var(--border-light);
+            color: var(--accent);
+            padding: 10px 30px;
+            font-family: 'Montserrat', sans-serif;
+            font-size: 0.7rem;
+            font-weight: 400;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            cursor: pointer;
+            border-radius: 2px;
+            transition: all 0.3s ease;
+        }
+
+        .next-btn:hover {
+            background-color: var(--accent);
+            border-color: var(--accent);
+            color: var(--bg-color);
+        }
+
+        .replay-btn {
+            background: transparent;
+            border: none;
+            color: var(--text-light);
+            padding: 10px 30px;
+            font-family: 'Montserrat', sans-serif;
+            font-size: 0.65rem;
+            font-weight: 300;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: color 0.3s ease;
+            display: none; 
+        }
+
+        .replay-btn:hover {
+            color: var(--accent);
+        }
+
+        .progress-dots {
+            display: flex;
+            gap: 12px;
+        }
+
+        .dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background-color: #e3dcdc;
+            transition: background-color 0.4s ease, transform 0.4s ease;
+        }
+
+        .dot.active {
+            background-color: var(--text-light);
+            transform: scale(1.2);
+        }
+
+        /* --- MOBILE ADJUSTMENTS --- */
+        @media (max-width: 600px) {
+            h1 { font-size: 2.4rem; }
+            .recipient-name { font-size: 2.8rem; }
+            .letter-body, .lyrics-body { font-size: 1.15rem; padding: 0 10px; }
+            .collage-wrapper { max-width: 320px; margin-bottom: 30px; }
+            .collage-img { border-width: 5px; border-bottom-width: 20px; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Local Audio Setup -->
+    <audio id="bg-music" src="Vivid.mp3" loop preload="auto"></audio>
+
+    <!-- Entrance Screen -->
+    <div id="entrance-screen">
+        <div class="envelope-text">
+            <p class="recipient-sub">Specially crafted for</p>
+            <p class="recipient-name">Hannah del Pilar</p>
+        </div>
+        <button class="enter-btn" id="start-btn">Open & Turn Sound On 🔊</button>
+    </div>
+
+    <!-- The Story Container -->
+    <div id="main-content">
+        <h1>For You</h1>
+        
+        <hr class="divider">
+        
+        <div id="book-container">
+            
+            <!-- CHAPTER 1 -->
+            <div class="chapter active">
+                <div class="chapter-title">Chapter I: The Little Things</div>
+                
+                <div class="collage-wrapper">
+                    <img src="https://images.unsplash.com/photo-1463171379579-3fdfb86d4285?q=80&w=400&auto=format&fit=crop" class="collage-img img-1" alt="Record player">
+                    <img src="https://images.unsplash.com/photo-1517457373958-b7bdd4587205?q=80&w=400&auto=format&fit=crop" class="collage-img img-2" alt="Coffee">
+                    <img src="https://images.unsplash.com/photo-1518655048521-f130df041f66?q=80&w=400&auto=format&fit=crop" class="collage-img img-3" alt="Books">
+                </div>
+                
+                <p class="letter-body">
+                    It started with the quiet, little things—the moments you probably didn't even notice. When we first became friends, I found myself slowly captivated by the <span class="highlight">beautiful details</span> of who you are. 
+
+                    I have always appreciated your incredible taste in music; the songs you share always seem to carry a certain kind of magic. I admire the fiercely beautiful way you love and care for your family. But more than anything, seeing the depth of your faith, the way you love God, and how you selflessly make time to uplift the people around you... that was when admiration turned into something much deeper. That was what made me truly start to fall for you.
+                </p>
+            </div>
+
+            <!-- CHAPTER 2 -->
+            <div class="chapter">
+                <div class="chapter-title">Chapter II: The Realization</div>
+                
+                <div class="collage-wrapper">
+                    <img src="https://images.unsplash.com/photo-1516589178581-6cd7833ae3b2?q=80&w=400&auto=format&fit=crop" class="collage-img img-1" alt="Street">
+                    <img src="https://images.unsplash.com/photo-1499209974431-9dddcece7f88?q=80&w=400&auto=format&fit=crop" class="collage-img img-2" alt="Quiet moment">
+                    <img src="https://images.unsplash.com/photo-1519681393784-d120267933ba?q=80&w=400&auto=format&fit=crop" class="collage-img img-3" alt="Stars">
+                </div>
+                
+                <p class="letter-body">
+                    I started to care for you as a friend first, but somewhere along the way, the ground beneath me shifted without me even realizing it. 
+
+                    I remember looking at you one day, and a very clear, sudden thought crossed my mind: "I really want to <span class="highlight">spend my whole life with you.</span>" It wasn't just a fleeting thought; it was a profound realization of how much space you have taken up in my heart. I realized just how incredibly much you mean to me, and the simple truth is, I do not ever want to face a future where you aren't in my life.
+                </p>
+            </div>
+
+            <!-- CHAPTER 3 -->
+            <div class="chapter">
+                <div class="chapter-title">Chapter III: My Hope</div>
+                
+                <div class="collage-wrapper">
+                    <img src="https://images.unsplash.com/photo-1518134346374-184f9d21cb2c?q=80&w=400&auto=format&fit=crop" class="collage-img img-1" alt="Sunset">
+                    <img src="https://images.unsplash.com/photo-1513279922550-250c2129b13a?q=80&w=400&auto=format&fit=crop" class="collage-img img-2" alt="Landscape">
+                    <img src="https://images.unsplash.com/photo-1505934333218-8fe21ff88c27?q=80&w=400&auto=format&fit=crop" class="collage-img img-3" alt="Warm light">
+                </div>
+                
+                <p class="letter-body">
+                    I built this just for you, as a way to lay my cards on the table and let you know exactly where my heart is. 
+
+                    I want you to know that I am always here in your corner, and <span class="highlight">I am always waiting.</span> I am holding onto the quiet, persistent hope that someday—if you are open to it, and if there is even the smallest chance—there could be a real "us" in the future. I don't want to rush you, I just needed you to know that you are deeply loved and cherished.
+                </p>
+            </div>
+
+            <!-- CHAPTER 4 -->
+            <div class="chapter">
+                <div class="chapter-title">Chapter IV: The Future</div>
+                
+                <div class="collage-wrapper">
+                    <img src="https://images.unsplash.com/photo-1494438639946-1ebd1d20bf85?q=80&w=400&auto=format&fit=crop" class="collage-img img-1" alt="Abstract Light">
+                    <img src="https://images.unsplash.com/photo-1490750967868-88aa4486c946?q=80&w=400&auto=format&fit=crop" class="collage-img img-2" alt="Flowers">
+                    <img src="https://images.unsplash.com/photo-1472396961693-142e6e269027?q=80&w=400&auto=format&fit=crop" class="collage-img img-3" alt="Nature">
+                </div>
+                
+                <p class="letter-body">
+                    Whatever happens next, please know that my intentions are pure. I value our connection above all else, and I will always protect it. But if you ever find yourself looking at me the way I have learned to look at you, know that my heart is ready. Until then, I will keep cheering you on, supporting your dreams, and appreciating every single moment I get to spend with you. Thank you for simply being you, Han.
+                </p>
+            </div>
+
+            <!-- CHAPTER 5 (EPILOGUE / LYRICS) -->
+            <div class="chapter">
+                <div class="chapter-title">Epilogue: Nais Ko</div>
+                
+                <div class="collage-wrapper">
+                    <img src="https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?q=80&w=400&auto=format&fit=crop" class="collage-img img-1" alt="Acoustic Guitar">
+                    <img src="https://images.unsplash.com/photo-1507838153414-b4b713384a76?q=80&w=400&auto=format&fit=crop" class="collage-img img-2" alt="Sheet music">
+                    <img src="https://images.unsplash.com/photo-1487180142328-054b783fc471?q=80&w=400&auto=format&fit=crop" class="collage-img img-3" alt="Vinyl vintage record">
+                </div>
+
+                <div class="lyrics-container">
+                    <div class="lyrics-title">♫ Now Playing: Nais Ko</div>
+                    <div class="lyrics-body">
+                        Nais kong yakapin ka nang mahigpit
+                        Sa bawat sandali na ika'y may hapis
+                        Nais kong hawakan ang iyong mga kamay
+                        Sabay nating tahakin ang landas ng buhay
+
+                        Ikaw ang dalangin sa bawat umaga
+                        Sa piling mo, ang puso ay may kapayapaan
+                        Nais ko, ang tanging nais ko
+                        Ay ang maging bahagi ng buong mundo mo
+                    </div>
+                </div>
+
+                <p class="signature">Sincerely yours,<br>Winston</p>
+            </div>
+
+        </div>
+
+        <!-- Navigation Controls -->
+        <div class="controls">
+            <div class="btn-row">
+                <button class="next-btn" id="prev-btn" style="display: none;">Previous</button>
+                <button class="next-btn" id="next-btn">Next</button>
+            </div>
+            <button class="replay-btn" id="replay-btn">Start Over</button>
+            
+            <!-- Dots container -->
+            <div class="progress-dots" id="dots-container"></div>
+        </div>
+
+    </div>
+
+    <!-- Script Logic -->
+    <script>
+        const audio = document.getElementById('bg-music');
+        audio.volume = 1.0; 
+
+        // 1. Updated Playlist Mapping
+        const chapterSongs = [
+            "Vivid.mp3",       // Chapter I
+            "Home.mp3",        // Chapter II
+            "unshakable.mp3",  // Chapter III
+            "unshakable.mp3",  // Chapter IV
+            "nais ko.mp3"       // Chapter V (Epilogue with Lyrics)
+        ];
+
+        // 2. Setup Chapters and Dynamic Dots
+        const chapters = document.querySelectorAll('.chapter');
+        const dotsContainer = document.getElementById('dots-container');
+        
+        chapters.forEach((_, index) => {
+            const dot = document.createElement('span');
+            dot.classList.add('dot');
+            if (index === 0) dot.classList.add('active');
+            dotsContainer.appendChild(dot);
+        });
+        
+        const dots = document.querySelectorAll('.dot');
+        let currentChapter = 0;
+        const nextBtn = document.getElementById('next-btn');
+        const prevBtn = document.getElementById('prev-btn');
+        const replayBtn = document.getElementById('replay-btn');
+
+        // Helper function to manage song transitions smoothly
+        function playSongForChapter(index) {
+            const targetSong = chapterSongs[index] || chapterSongs[chapterSongs.length - 1];
+            if (!audio.src.endsWith(targetSong)) {
+                audio.src = targetSong;
+                audio.play().catch(error => console.log("Audio playback failed:", error));
+            }
+        }
+
+        // 3. Entrance Button Logic
+        document.getElementById('start-btn').addEventListener('click', function() {
+            audio.src = chapterSongs[0];
+            audio.play().catch(error => console.log("Audio playback failed:", error));
+
+            const entranceScreen = document.getElementById('entrance-screen');
+            entranceScreen.style.opacity = '0';
+            setTimeout(() => { entranceScreen.style.display = 'none'; }, 1500);
+
+            document.getElementById('main-content').classList.add('visible');
+        });
+
+        // 4. Next Chapter Navigation Logic
+        nextBtn.addEventListener('click', function() {
+            chapters[currentChapter].classList.remove('active');
+            dots[currentChapter].classList.remove('active');
+            
+            setTimeout(() => {
+                currentChapter++;
+                
+                if (currentChapter < chapters.length) {
+                    chapters[currentChapter].classList.add('active');
+                    dots[currentChapter].classList.add('active');
+                    playSongForChapter(currentChapter);
+                }
+                
+                // Toggle display rules for buttons
+                if (currentChapter > 0) {
+                    prevBtn.style.display = 'block';
+                }
+                if (currentChapter === chapters.length - 1) {
+                    nextBtn.style.display = 'none';
+                    replayBtn.style.display = 'block';
+                }
+            }, 800);
+        });
+
+        // 5. Previous Chapter Navigation Logic
+        prevBtn.addEventListener('click', function() {
+            chapters[currentChapter].classList.remove('active');
+            dots[currentChapter].classList.remove('active');
+            
+            setTimeout(() => {
+                currentChapter--;
+                
+                if (currentChapter >= 0) {
+                    chapters[currentChapter].classList.add('active');
+                    dots[currentChapter].classList.add('active');
+                    playSongForChapter(currentChapter);
+                }
+                
+                // Toggle display rules for buttons back down
+                if (currentChapter === 0) {
+                    prevBtn.style.display = 'none';
+                }
+                nextBtn.style.display = 'block';
+                replayBtn.style.display = 'none';
+            }, 800);
+        });
+
+        // 6. Replay Button Logic
+        replayBtn.addEventListener('click', function() {
+            chapters[currentChapter].classList.remove('active');
+            dots[currentChapter].classList.remove('active');
+            
+            setTimeout(() => {
+                currentChapter = 0;
+                
+                chapters[currentChapter].classList.add('active');
+                dots[currentChapter].classList.add('active');
+                
+                replayBtn.style.display = 'none';
+                prevBtn.style.display = 'none';
+                nextBtn.style.display = 'block';
+                
+                audio.src = chapterSongs[0];
+                audio.play().catch(error => console.log("Audio playback failed:", error));
+                
+            }, 800);
+        });
+    </script>
+
+</body>
+</html>
